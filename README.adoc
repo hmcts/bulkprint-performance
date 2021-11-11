@@ -1,0 +1,8 @@
+### Bulk Print Gatling Performance Tests
+
+To run locally:
+- Performance test against the perftest environment: `./gradlew gatlingRun`
+
+Flags:
+- Debug (single-user mode): `-Ddebug=on e.g. ./gradlew gatlingRun -Ddebug=on`
+- Run against AAT: `Denv=aat e.g. ./gradlew gatlingRun -Denv=aat`
