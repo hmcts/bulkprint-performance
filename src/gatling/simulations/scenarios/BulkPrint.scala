@@ -3,7 +3,6 @@ package scenarios
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import utils.Environment
-import scala.concurrent.duration._
 import java.util.UUID
 
 object BulkPrint {
@@ -23,8 +22,6 @@ object BulkPrint {
         .post(RpeAPIURL + "/testing-support/lease")
         .body(StringBody("""{"microservice":"${service}"}""")).asJson
         .check(bodyString.saveAs("authToken")))
-
-    .pause(MinThinkTime seconds, MaxThinkTime seconds)
 
   }
 
@@ -46,8 +43,6 @@ object BulkPrint {
       .check(jsonPath("$.upload.sas").saveAs("sas"))
       .check(jsonPath("$.upload.manifest_path").saveAs("manifestPath")))
 
-    .pause(MinThinkTime seconds, MaxThinkTime seconds)
-
   }
 
   val UploadFiles = {
@@ -64,8 +59,6 @@ object BulkPrint {
 
     }
 
-    .pause(MinThinkTime seconds, MaxThinkTime seconds)
-
   }
 
   val UploadManifest = {
@@ -77,8 +70,6 @@ object BulkPrint {
         "x-ms-blob-type" -> "BlockBlob"))
       .body(StringBody("${manifestJSON}")).asJson
       .check(status.is(201)))
-
-    .pause(MinThinkTime seconds, MaxThinkTime seconds)
 
   }
 
