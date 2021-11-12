@@ -1,14 +1,7 @@
 {
   "type": "SSC001",
   "documents": [
-    {
-      "file_name": "1.pdf",
-      "copies_required": 2
-    },
-    {
-      "file_name": "2.pdf",
-      "copies_required": 1
-    }
+    ${docRequestJSON}
   ],
   "case_id": "${guid}",
   "case_ref": "162MC0668",
