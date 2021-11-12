@@ -65,6 +65,7 @@ class BulkPrint_Simulation extends Simulation {
     .exitBlockOnFail {
       exec( _.set("env", s"${env}"))
       .exec(
+        BulkPrint.Initialise,
         BulkPrint.Auth,
         BulkPrint.SendPrintRequest,
         BulkPrint.UploadFiles,
