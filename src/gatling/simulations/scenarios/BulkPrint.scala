@@ -16,10 +16,13 @@ object BulkPrint {
 
   val serviceFeeder = csv("services.csv").random
 
+  //Size of documents need to match the PDF filenames
+  val sizeOfDocumentsDistribution = Map("150KB" -> 50.0, "500KB" -> 25.0, "1MB" -> 15.0, "2MB" -> 10.0)
+
   /* Generate variables for manifest*/
   val Initialise = {
 
-    //Set the options for number of documents and copies and each of their associated distribution
+    //Set the options for size and number of documents and copies and each of their associated distribution
     // e.g. 1 -> 50.0, 2 -> 20.0, 3 -> 15.0 would mean 1 has a 50% chance of being chosen, 2 has 20% chance, etc.
     //Note: Distributions don't have to add up to 100
     val numberOfDocumentsDistribution = Map(1 -> 35.0, 2 -> 35.0, 3 -> 20.0, 4 -> 10.0)
@@ -89,12 +92,15 @@ object BulkPrint {
 
     foreach("${uploadPaths}", "path") {
 
-      exec(http("BulkPrint_030_UploadFile")
+      //For each file, select the size (and name) of the file
+      exec(_.set("sizeOfDocument", Common.sample(sizeOfDocumentsDistribution)))
+
+      .exec(http("BulkPrint_030_UploadFile")
         .put("${uploadContainer}/${path}?${sas}")
         .headers(Map(
           "x-ms-write" -> "update",
           "x-ms-blob-type" -> "BlockBlob"))
-        .body(RawFileBody("test.pdf"))
+        .body(RawFileBody("${sizeOfDocument}.pdf"))
         .check(status.is(201)))
 
     }
