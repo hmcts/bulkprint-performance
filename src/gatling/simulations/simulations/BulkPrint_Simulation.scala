@@ -34,11 +34,11 @@ class BulkPrint_Simulation extends Simulation {
   /* ******************************** */
 
   /* PERFORMANCE TEST CONFIGURATION */
-  val rampUpDurationMins = 1
-  val rampDownDurationMins = 1
-  val testDurationMins = 5
+  val rampUpDurationMins = 5
+  val rampDownDurationMins = 5
+  val testDurationMins = 60
 
-  val hourlyTarget:Double = 10
+  val hourlyTarget:Double = 500
   val ratePerSec = hourlyTarget / 3600
 
   //If running in debug mode, disable pauses between steps
@@ -49,7 +49,7 @@ class BulkPrint_Simulation extends Simulation {
   /* ******************************** */
 
   /* PIPELINE CONFIGURATION */
-  val numberOfPipelineUsers:Double = 5
+  val numberOfPipelineUsers:Double = 10
   /* ******************************** */
 
   val httpProtocol = Environment.HttpProtocol
@@ -104,7 +104,7 @@ class BulkPrint_Simulation extends Simulation {
   def assertions(simulationType: String): Seq[Assertion] = {
     simulationType match {
       case "perftest" =>
-        Seq(global.successfulRequests.percent.gte(100))
+        Seq(global.successfulRequests.percent.gte(99))
       case "pipeline" =>
         Seq(global.successfulRequests.percent.gte(100))
       case _ =>
