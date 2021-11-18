@@ -71,9 +71,6 @@ class BulkPrint_Simulation extends Simulation {
         BulkPrint.UploadFiles,
         BulkPrint.UploadManifest
       )
-      .exec(flushHttpCache)
-      .exec(flushCookieJar)
-      //.exec(_.remove("docRequestJSON"))
     }
 
     .exec {
@@ -81,6 +78,9 @@ class BulkPrint_Simulation extends Simulation {
         println(session)
         session
     }
+  //.exec(flushHttpCache)
+  //.exec(flushCookieJar)
+  //.exec(_.remove("docRequestJSON"))
 
   //defines the Gatling simulation model, based on the inputs
   def simulationProfile(simulationType: String, userPerSecRate: Double, numberOfPipelineUsers: Double): Seq[OpenInjectionStep] = {
