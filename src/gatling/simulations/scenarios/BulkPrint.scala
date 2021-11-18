@@ -5,6 +5,7 @@ import io.gatling.http.Predef._
 import utils.{Common, Environment}
 import java.util.UUID
 import scala.collection.mutable
+import scala.concurrent.duration._
 
 object BulkPrint {
 
@@ -102,6 +103,8 @@ object BulkPrint {
           "x-ms-blob-type" -> "BlockBlob"))
         .body(RawFileBody("${sizeOfDocument}.pdf"))
         .check(status.is(201)))
+
+        .pause(100 milliseconds)
 
     }
 

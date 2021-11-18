@@ -71,6 +71,9 @@ class BulkPrint_Simulation extends Simulation {
         BulkPrint.UploadFiles,
         BulkPrint.UploadManifest
       )
+      .exec(flushHttpCache)
+      .exec(flushCookieJar)
+      //.exec(_.remove("docRequestJSON"))
     }
 
     .exec {
