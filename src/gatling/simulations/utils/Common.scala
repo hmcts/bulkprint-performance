@@ -1,7 +1,5 @@
 package utils
 
-import scala.util.Random
-
 object Common {
 
   /*======================================================================================
@@ -13,13 +11,13 @@ object Common {
     Example:
 
     val listOfItemsAndDistributions = Map(1 -> 50.0, 2 -> 30.0, 3 -> 10.0, 4 -> 10.0)
-    sample(listOfItemsAndDistributions)
+    sample(listOfItemsAndDistributions, randomNumber)
 
     has a 50% chance of returning 1, 30% chance of returning 2, 10% chance of returning 3, 10% chance of returning 4
     Note: the sum of the distributions doesn't have to total 100
    */
-  final def sample[A](distribution: Map[A, Double]): A = {
-    val rand = Random.nextDouble * distribution.values.sum
+  def sample[A](distribution: Map[A, Double], randomNumber : Double): A = {
+    val rand = randomNumber * distribution.values.sum
     val counter = distribution.iterator
     var cumulative = 0.0
     while (counter.hasNext) {
