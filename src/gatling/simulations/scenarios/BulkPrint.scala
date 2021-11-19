@@ -3,8 +3,10 @@ package scenarios
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import utils.{Common, Environment}
+
 import java.util.UUID
 import scala.concurrent.duration._
+import scala.util.Random
 
 object BulkPrint {
 
@@ -15,6 +17,7 @@ object BulkPrint {
   val MaxThinkTime = Environment.maxThinkTime
 
   val serviceFeeder = csv("services.csv").random
+  val randomFeeder = Iterator.continually(Map(("rand" -> Random.nextDouble())))
 
   //Size of documents need to match the PDF filenames
   val sizeOfDocumentsDistribution = Map("150KB" -> 50.0, "500KB" -> 25.0, "1MB" -> 15.0, "2MB" -> 10.0)
@@ -28,16 +31,21 @@ object BulkPrint {
     val numberOfDocumentsDistribution = Map(1 -> 35.0, 2 -> 35.0, 3 -> 20.0, 4 -> 10.0)
     val numberOfCopiesDistribution = Map(1 -> 50.0, 2 -> 20.0, 3 -> 15.0, 4 -> 10.0, 5 -> 5.0)
 
-    //Select the number of documents in the manifest
-    val numberOfDocuments = Common.sample(numberOfDocumentsDistribution)
+    //Select the number of documents
+    feed(randomFeeder)
+    .exec { session =>
+      val numberOfDocuments = Common.sample(numberOfDocumentsDistribution, session("rand").as[Double])
+      session.set("numberOfDocuments", numberOfDocuments)
+    }
 
     //Use a session list to store each document JSON element e.g. {"file_name": "1.pdf","copies_required": 2}
-    exec(_.set("docRequestList", List()))
+    .exec(_.set("docRequestList", List()))
 
     //For each document, select the number of copies, generate the JSON element and store in the session list
-    .repeat(numberOfDocuments, "count"){
-      exec { session =>
-        val numberOfCopies = Common.sample(numberOfCopiesDistribution)
+    .repeat("${numberOfDocuments}", "count"){
+      feed(randomFeeder)
+      .exec { session =>
+        val numberOfCopies = Common.sample(numberOfCopiesDistribution, session("rand").as[Double])
         val index = session("count").as[Int] + 1
         val template = s"""{"file_name":"${index}.pdf","copies_required":${numberOfCopies}}"""
         for {
@@ -95,10 +103,20 @@ object BulkPrint {
 
   val UploadFiles = {
 
-    foreach("${uploadPaths}", "path") {
+    //Use a session list to record the file sizes
+    exec(_.set("docSizeList", List()))
 
-      //For each file, select the size (and name) of the file
-      exec(_.set("sizeOfDocument", Common.sample(sizeOfDocumentsDistribution)))
+    //For each file, select the size (and name), upload the file and store in the session list for reference
+    .foreach("${uploadPaths}", "path") {
+
+      feed(randomFeeder)
+      .exec { session =>
+        val sizeOfDocument = Common.sample(sizeOfDocumentsDistribution, session("rand").as[Double])
+        for {
+          existingSizeList <- session("docSizeList").validate[List[String]]
+        } yield session.set("docSizeList", existingSizeList ::: List(sizeOfDocument))
+          .set("sizeOfDocument", sizeOfDocument)
+      }
 
       .exec(http("BulkPrint_030_UploadFile")
         .put("${uploadContainer}/${path}?${sas}")
